@@ -47,7 +47,7 @@
 		function removeComment(content,type) {
 			switch (type){
 				case 'html':
-					var reg = /\s*<--[\s\S]?-->\s*/g;
+					var reg = /\s*<!--\s*\S*\s*-->\s*/g;
 					content = content.replace(reg,'');
 					break;
 				case 'js':
