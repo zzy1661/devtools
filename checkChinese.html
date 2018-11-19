@@ -1,0 +1,65 @@
+<!doctype html>
+<html >
+<head>
+	<meta charset="UTF-8" />
+	<title>搜索文件中的中文</title>
+	<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+</head>
+<body>
+	<input type="file" multiple="multiple" id="file" />
+	<div id="result">
+		
+	</div>
+	<script type="text/javascript">
+		document.querySelector('#file').addEventListener('change',function(e) {
+			var resultDom = document.querySelector('#result');
+			resultDom.innerHTML = '';
+			var files = Array.prototype.slice.call(e.target.files,0);
+			files.forEach((file,index) => {
+				var fileReader = new FileReader();
+				fileReader.onload = function(e) {
+					var content = this.result;
+					var type;
+					if(file.name.match(/\.vue$|.html$/)) {
+						type = 'html';
+					}
+					if(file.name.match(/\.js$/)) {
+						type = 'js';
+					}
+					content = removeComment(content,type);
+					//匹配汉字
+					var reg = /\p{Unified_Ideograph}+/ug;
+					var result;
+					var h3 = document.createElement('h3');
+					h3.innerHTML = file.name;
+					resultDom.appendChild(h3);
+					var matches = content.match(reg);
+					if(matches){
+						var p = document.createElement('p');
+						p.innerHTML = matches.join(', ');
+						resultDom.appendChild(p);
+					}
+				}
+				fileReader.readAsText(file);
+			});
+		})
+		//去除注释
+		function removeComment(content,type) {
+			switch (type){
+				case 'html':
+					var reg = /\s*<--[\s\S]?-->\s*/g;
+					content = content.replace(reg,'');
+					break;
+				case 'js':
+					var reg = /("([^\\\"]*(\\.)?)*")|('([^\\\']*(\\.)?)*')|(\/{2,}.*?(\r|\n|$))|(\/\*(\n|.)*?\*\/)/g;
+					content = content.replace(reg, function(word) { 
+					      // 去除注释后的文本 
+					    return /^\/{2,}/.test(word) || /^\/\*/.test(word) ? "" : word; 
+					  });
+					break;
+			}
+			return content;
+		}
+	</script>
+</body>
+</html>
