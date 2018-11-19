@@ -43,6 +43,7 @@
 				fileReader.readAsText(file);
 			});
 		})
+		
 		//去除注释
 		function removeComment(content,type) {
 			switch (type){
@@ -51,11 +52,9 @@
 					content = content.replace(reg,'');
 					break;
 				case 'js':
-					var reg = /("([^\\\"]*(\\.)?)*")|('([^\\\']*(\\.)?)*')|(\/{2,}.*?(\r|\n|$))|(\/\*(\n|.)*?\*\/)/g;
-					content = content.replace(reg, function(word) { 
-					      // 去除注释后的文本 
-					    return /^\/{2,}/.test(word) || /^\/\*/.test(word) ? "" : word; 
-					  });
+					var reg1 = /\/\*{1,2}[\s\S]*?\*\//g;
+					var reg2 = /\/\/[\s\S]*?\n/g;
+					content = content.replace(reg1,'').replace(reg2,'');
 					break;
 			}
 			return content;
