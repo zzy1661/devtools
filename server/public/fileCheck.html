@@ -85,6 +85,27 @@
 		function postFileLocation(location) {
 			return $.post('/fileCheck',{file:location})
 		}
+		function initWs() {
+			var socket = io('ws://localhost:3000',{forceNew:true});
+			
+		}
+		$.get('/fileCheck').done(function() {
+			var socket = io.connect('//localhost:3001',{
+				path: '/test'
+			});
+				socket.on('news', function (data) {
+					console.log(data);
+					socket.emit('my other event', { my: 'data' });
+				});
+		})
+		//socket test
+		/* var socket = io('//localhost:3000',{
+			path:'/wstest'
+		});
+		socket.on('news',function(data) {
+			console.log(data);
+			socket.emit('my other event',{my:'data'});
+		}) */
 		
 	</script>
 </html>
