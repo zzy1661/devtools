@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+		<!-- 新 Bootstrap4 核心 CSS 文件 -->
+		<link rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/4.1.0/css/bootstrap.min.css">
+		<!-- jQuery文件。务必在bootstrap.min.js 之前引入 -->
+		<script src="https://cdn.staticfile.org/jquery/3.2.1/jquery.min.js"></script>
+		<!-- 最新的 Bootstrap4 核心 JavaScript 文件 -->
+		<script src="https://cdn.staticfile.org/twitter-bootstrap/4.1.0/js/bootstrap.min.js"></script>
+		<script src="https://cdn.jsdelivr.net/npm/vue@2.5.17/dist/vue.js"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.1.1/socket.io.dev.js" type="text/javascript" charset="utf-8"></script>
+	</head>
+
+	<body>
+		<div class="container" id="app">
+			<div class="row">
+				<div class="col-6 border-right border-primary">
+					<div class="form">
+						<div class="form-group">
+							<label for="">file1</label>
+							<input type="text" class="form-control" id="file1"/>
+						</div>
+						<button class="btn btn-primary" id="file1btn">确定</button>
+					</div>
+					<pre id="content1">
+						<table class="table table-sm">
+							<tr v-for="item,index in file1">
+								<td>{{index+1}}</td>
+								<td>{{item}}</td>
+							</tr>
+						</table>
+					</pre>
+				</div>
+				<div class="col-6">
+					<div class="form">
+						<div class="form-group">
+							<label for="">file1</label>
+							<input type="text" class="form-control" id="file2"/>
+						</div>
+						<button class="btn btn-primary" id="file1btn">确定</button>
+					</div>
+					<pre id="content2">
+						<table class="table table-sm">
+							<tr v-for="item,index in file2">
+								<td>{{index+1}}</td>
+								<td>{{item}}</td>
+							</tr>
+						</table>
+					</pre>
+				</div>
+			</div>
+		</div>
+		
+	</body>
+	<script type="text/javascript">
+		var app = new Vue({
+			el: '#app',
+			data:{
+				file1:[],
+				file2:[]
+			}
+		})
+		
+		$('#file1btn').on('click',function() {
+			var l = $('#file1').val().trim();
+			if(l){
+				postFileLocation(l).done(res=>{
+					res = JSON.parse(res);
+					app.$data.file1 = res.content.split(/\n/);
+				})
+			}
+		})
+		$('file2btn').on('click',function() {
+			var l = $('#file2').val().trim();
+			if(l){
+				postFileLocation(l).done(res=>{
+					res = JSON.parse(res);
+					app.$data.file2 = res.content.split(/\n/);
+				})
+			}
+		})
+		function postFileLocation(location) {
+			return $.post('/fileCheck',{file:location})
+		}
+		
+	</script>
+</html>
