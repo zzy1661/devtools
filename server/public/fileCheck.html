@@ -67,45 +67,31 @@
 		$('#file1btn').on('click',function() {
 			var l = $('#file1').val().trim();
 			if(l){
-				postFileLocation(l).done(res=>{
-					res = JSON.parse(res);
-					app.$data.file1 = res.content.split(/\n/);
-				})
+				getFileContent(l,app.$data.file1) 
 			}
 		})
 		$('file2btn').on('click',function() {
 			var l = $('#file2').val().trim();
 			if(l){
-				postFileLocation(l).done(res=>{
-					res = JSON.parse(res);
-					app.$data.file2 = res.content.split(/\n/);
-				})
+				getFileContent(l,app.$data.file2) 
 			}
 		})
+		function getFileContent(l,fileContainer) {
+			return postFileLocation(l).done(res=>{
+				res = JSON.parse(res);
+				fileContainer = res.content.split(/\n/);
+				console.log(res);
+			})
+		}
 		function postFileLocation(location) {
 			return $.post('/fileCheck',{file:location})
 		}
-		function initWs() {
-			var socket = io('ws://localhost:3000',{forceNew:true});
-			
+		function initWs(chanelId) {
+			var socket = io(`http://localhost:8080/${chanelId}`);
+			return socket;			
 		}
-		$.get('/fileCheck').done(function() {
-			var socket = io.connect('//localhost:3001',{
-				path: '/test'
-			});
-				socket.on('news', function (data) {
-					console.log(data);
-					socket.emit('my other event', { my: 'data' });
-				});
-		})
-		//socket test
-		/* var socket = io('//localhost:3000',{
-			path:'/wstest'
-		});
-		socket.on('news',function(data) {
-			console.log(data);
-			socket.emit('my other event',{my:'data'});
-		}) */
+	
+		
 		
 	</script>
 </html>
