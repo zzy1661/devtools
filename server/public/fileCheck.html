@@ -12,10 +12,19 @@
 		<script src="https://cdn.staticfile.org/twitter-bootstrap/4.1.0/js/bootstrap.min.js"></script>
 		<script src="https://cdn.jsdelivr.net/npm/vue@2.5.17/dist/vue.js"></script>
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.1.1/socket.io.dev.js" type="text/javascript" charset="utf-8"></script>
+		<style>
+			pre {
+				margin: 0;
+			}
+			.content {
+				font-size: 12px;
+				overflow: auto;
+			}
+		</style>
 	</head>
 
 	<body>
-		<div class="container" id="app">
+		<div class="container-fluid" id="app">
 			<div class="row">
 				<div class="col-6 border-right border-primary">
 					<div class="form">
@@ -25,14 +34,14 @@
 						</div>
 						<button class="btn btn-primary" id="file1btn">确定</button>
 					</div>
-					<pre id="content1">
+					<div id="content1" class="content">
 						<table class="table table-sm">
 							<tr v-for="item,index in file1">
 								<td>{{index+1}}</td>
-								<td>{{item}}</td>
+								<td><pre>{{item}}</pre></td>
 							</tr>
 						</table>
-					</pre>
+					</div>
 				</div>
 				<div class="col-6">
 					<div class="form">
@@ -42,14 +51,14 @@
 						</div>
 						<button class="btn btn-primary" id="file1btn">确定</button>
 					</div>
-					<pre id="content2">
+					<div id="content2" class="content">
 						<table class="table table-sm">
 							<tr v-for="item,index in file2">
 								<td>{{index+1}}</td>
-								<td>{{item}}</td>
+								<td><pre>{{item}}</pre></td>
 							</tr>
 						</table>
-					</pre>
+					</div>
 				</div>
 			</div>
 		</div>
@@ -79,8 +88,10 @@
 		function getFileContent(l,fileContainer) {
 			return postFileLocation(l).done(res=>{
 				res = JSON.parse(res);
-				fileContainer = res.content.split(/\n/);
-				console.log(res);
+				fileContainer.splice(0,fileContainer.length); 
+				console.log(fileContainer)
+				Array.prototype.push.call(fileContainer,...(res.content.replace(/\t/g,'  ').split(/\n/)));
+				initWs(res.chanelId)
 			})
 		}
 		function postFileLocation(location) {
