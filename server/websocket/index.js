@@ -2,7 +2,7 @@ var express = require('express');
 var socketApp = express();
 var socketServer = require('http').Server(socketApp);
 var io = require('socket.io')(socketServer);
-io.on('connection', function(socket) {
+/* io.on('connection', function(socket) {
 	socket.on('disconnect', function() {
 		console.log('user disconnected');
 	});
@@ -13,8 +13,9 @@ io.on('connection', function(socket) {
 	io.emit('some event', { for: 'everyone' });
 	socket.broadcast.emit('hi','broadcast');
 
-});
+}); */
 
 socketServer.listen(8080, function() {
 	console.log('socket listening on *:8080');
 });
+module.exports = io;
