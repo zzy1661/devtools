@@ -2,32 +2,26 @@ var express = require('express');
 var fs = require('fs');
 var router = express.Router();
 
-/* GET users listing. */
+
 router.post('/', function(req, res, next) {
 	var location = req.body.file;
+
+	//读取文件，返回文本内容
 	fs.readFile(location,'utf8',(err, data) => {
 		if(err) throw err;
-		console.log(data);
 		res.end(JSON.stringify({
 			content: data
 		}));
 	});
+	//建立websocket 通道
+	
+	//观察文件，发送信息
+	var watcher = fs.watch(location);
+	watcher.on('change',function(e,file) {
+		console.log(file);
+	})
+
+
 });
-router.get('/', function(req, res, next) {
-	const io = require('socket.io')(3001, {
-		path: '/test',
-		serveClient: false,
-		// below are engine.IO options
-		pingInterval: 10000,
-		pingTimeout: 5000,
-		cookie: false
-	  });
-	  io.on('connection',function(socket) {
-		socket.emit('news',{hello:'world'});
-		socket.on('my other event', function(data) {
-		  console.log(data);
-		})
-	  })
-	res.end('111')
-});
+
 module.exports = router;
