@@ -1,9 +1,12 @@
 var express = require('express');
 var randomUid = require('uuid/v4');
 var fs = require('fs');
+var crypto = require('crypto');
 var io = require('../websocket');
 
+
 var router = express.Router();
+
 
 router.post('/', function (req, res, next) {
 	var location = req.body.file;
@@ -24,10 +27,6 @@ router.post('/', function (req, res, next) {
 		socket.on('disconnect', function () {
 			console.log('user disconnected');
 		});
-		socket.on('chat message', function (msg) {
-			console.log('message: ' + msg);
-			wsChanel.emit('chat message', msg);
-		});
 		//观察文件，发送信息
 		fileWatch(location, socket);
 	});
@@ -35,17 +34,26 @@ router.post('/', function (req, res, next) {
 
 function fileWatch(location, socket) {
 	var fw = fs.watch(location);
-	var count = 1; //解决window下watch出发两次的bug
-	fw.on('change', function (e, f) {
-		if (count % 2 === 0) {
-			count = 1;
+	var md5Previous = null;
+	var fsWait = false;
+	fw.on('change', function (event, filename) {
+		if (filename) {
+			if (fsWait) return;
+			fsWait = setTimeout(() => {
+			  fsWait = false;
+			}, 100);
 			fs.readFile(location, 'utf8', (err, data) => {
-				if (err) throw err;
-				socket.emit('chat message', {content: data});
+				var md5 = crypto.createHash('md5');
+				var md5Current = md5.update(data).digest('hex');
+				if (md5Current === md5Previous) {
+					return;
+				}
+				md5Previous = md5Current;
+				socket.emit('save', {content: data});
+				console.log('emit end')
 			});
-		} else {
-			count++;
-		}
+		  }
+		
 	})
 }
 

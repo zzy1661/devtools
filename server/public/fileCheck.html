@@ -38,7 +38,7 @@
 						<table class="table table-sm">
 							<tr v-for="item,index in file1">
 								<td>{{index+1}}</td>
-								<td><pre>{{item}}</pre></td>
+								<td :class="{'bg-info':item!=file2[index]}"><pre>{{item}}</pre></td>
 							</tr>
 						</table>
 					</div>
@@ -46,63 +46,22 @@
 				<div class="col-6">
 					<div class="form">
 						<div class="form-group">
-							<label for="">file1</label>
+							<label for="">file2</label>
 							<input type="text" class="form-control" id="file2"/>
 						</div>
-						<button class="btn btn-primary" id="file1btn">确定</button>
+						<button class="btn btn-primary" id="file2btn">确定</button>
 					</div>
 					<div id="content2" class="content">
 						<table class="table table-sm">
 							<tr v-for="item,index in file2">
 								<td>{{index+1}}</td>
-								<td><pre>{{item}}</pre></td>
+								<td :class="{'bg-warning':item!=file1[index]}"><pre>{{item}}</pre></td>
 							</tr>
 						</table>
 					</div>
 				</div>
 			</div>
 		</div>
-		
+		<script src="./js/index.js"></script>
 	</body>
-	<script type="text/javascript">
-		var app = new Vue({
-			el: '#app',
-			data:{
-				file1:[],
-				file2:[]
-			}
-		})
-		
-		$('#file1btn').on('click',function() {
-			var l = $('#file1').val().trim();
-			if(l){
-				getFileContent(l,app.$data.file1) 
-			}
-		})
-		$('file2btn').on('click',function() {
-			var l = $('#file2').val().trim();
-			if(l){
-				getFileContent(l,app.$data.file2) 
-			}
-		})
-		function getFileContent(l,fileContainer) {
-			return postFileLocation(l).done(res=>{
-				res = JSON.parse(res);
-				fileContainer.splice(0,fileContainer.length); 
-				console.log(fileContainer)
-				Array.prototype.push.call(fileContainer,...(res.content.replace(/\t/g,'  ').split(/\n/)));
-				initWs(res.chanelId)
-			})
-		}
-		function postFileLocation(location) {
-			return $.post('/fileCheck',{file:location})
-		}
-		function initWs(chanelId) {
-			var socket = io(`http://localhost:8080/${chanelId}`);
-			return socket;			
-		}
-	
-		
-		
-	</script>
 </html>
